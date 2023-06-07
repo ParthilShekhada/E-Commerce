@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DropIn from "braintree-web-drop-in-react";
-import { AiFillWarning } from "react-icons/ai";
 import axios from "axios";
 import toast from "react-hot-toast";
 import "../../styles/CartStyles.css";
@@ -12,7 +11,7 @@ import { useAuth } from "../../context/auth";
 
 
 const CartPage = () => {
-    const [auth, setAuth] = useAuth();
+    const [auth] = useAuth();
     const [cart, setCart] = useCart();
     const [clientToken, setClientToken] = useState("");
     const [instance, setInstance] = useState("");
@@ -54,7 +53,6 @@ const CartPage = () => {
             
             setClientToken(data?.response.clientToken);
         } catch (error) {
-            console.log(error);
         }
     };
     useEffect(() => {

@@ -152,8 +152,8 @@ const HomePage = () => {
           <div className="d-flex flex-column">
             <Radio.Group onChange={(e) => setRadio(e.target.value)}>
               {Prices?.map((p) => (
-                <div key={p._id}>
-                  <Radio value={p.array}>{p.name}</Radio>
+                <div >
+                  <Radio key={p._id} value={p.array}>{p.name}</Radio>
                 </div>
               ))}
             </Radio.Group>
@@ -179,7 +179,7 @@ const HomePage = () => {
                 />
                 <div className="card-body">
                   <div className="card-name-price">
-                    <h5 className="card-title">{p.name}</h5>
+                    <h5  className="card-title">{p.name}</h5>
                     <h5 className="card-title card-price">
                       {p.price.toLocaleString("en-US", {
                         style: "currency",
