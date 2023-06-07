@@ -29,7 +29,7 @@ font-family: 'Poppins', sans-serif; */
 }
 
 .active{
-    border-bottom:1px solid black;
+    border-bottom:1px solid white;
 }
 
 .navbar-brand{
@@ -120,4 +120,20 @@ font-family: 'Poppins', sans-serif; */
   justify-content: center;
   height: 70vh;
   flex-direction: column;
+}
+
+/* ==================== */
+.product-link {
+  text-decoration: none !important;
+  color: black !important;
+}
+
+.cat-btn {
+  padding: 40px 0px;
+  font-size: 24px;
+  text-transform: uppercase;
+}
+.cat-btn:hover {
+  background-color: #434343;
+  color: white;
 }

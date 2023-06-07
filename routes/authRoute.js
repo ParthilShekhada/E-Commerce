@@ -1,5 +1,5 @@
 const express=require('express')
-const {registerController,loginController,testController,forgotPasswordController}=require('../controllers/authController')
+const {registerController,loginController,orderStatusController,getAllOrdersController,getOrdersController,testController,updateProfileController,forgotPasswordController}=require('../controllers/authController')
 const {requireSignIn, isAdmin} = require('../middlewares/authMiddleware')
 
 //router object
@@ -21,6 +21,24 @@ router.get('/user-auth',requireSignIn,(req,res)=>{
 router.get('/admin-auth',requireSignIn,isAdmin,(req,res)=>{
     res.status(200).json({ok:true})
 })
+
+router.put("/order-status/:orderId",requireSignIn,isAdmin,orderStatusController)
+
+
+router.put('/profile',requireSignIn,updateProfileController)
+
+
+//orders
+router.get('/orders',requireSignIn,getOrdersController)
+
+//adminOrders
+router.get('/all-orders',requireSignIn,isAdmin,getAllOrdersController)
+
+
+
+
+
+
 
 
 

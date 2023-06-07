@@ -137,7 +137,27 @@ const deleteCategoryController=async(req,res)=>{
     }
 }
 
+const categoryByIdController=async(req,res)=>{
+    try {
+
+        const category=await categoryModel.findById(req.params.id)
+
+        res.status(200).json({
+            error:false,
+            message:'Get Single Category Success',
+            category
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            error:true,
+            errorMessage:error.message,
+            message:'Error while getting single category'
+        })
+    }
+}
+
 
 
 module.exports={createCategoryController,updateCategoryController,categoryController,
-    singleCategoryController,deleteCategoryController}
+    singleCategoryController,deleteCategoryController,categoryByIdController}
