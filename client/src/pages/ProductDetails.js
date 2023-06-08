@@ -53,12 +53,11 @@ const ProductDetails = () => {
             <div className="row container product-details">
                 <div className="col-md-6">
                     <img
-                    style={{marginLeft:'40px'}}
                         src={`${process.env.REACT_APP_API}/product/product-photo/${product._id}`}
                         className="card-img-top"
                         alt={product.name}
                         height="300"
-                        width={"350px"}
+                        width={"300px"}
                     />
                 </div>
                 <div className="col-md-6 product-details-info">
