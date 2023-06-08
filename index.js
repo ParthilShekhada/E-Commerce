@@ -8,12 +8,14 @@ const authRoutes=require('./routes/authRoute.js')
 const cors=require('cors')
 const categoryRoutes=require('./routes/categoryRoutes.js')
 const productRoutes=require('./routes/productRoute.js')
+const path=require('path')
 
 
 //middleware
 app.use(cors())
 app.use(express.json())
 app.use(morgan('dev'))
+app.use(express.static(path.join(__dirname,'./client/build')))
 
 
 //configure dotenv
@@ -31,8 +33,8 @@ app.use('/product',productRoutes)
 
 
 //rest api
-app.get('/', (req, res) => {
-    res.send("<h1>Welcome to Ecommerce app")
+app.use('*',function(req,res){
+    res.sendFile(__dirname,'/client/build/index.html')
 })
 
 const PORT = process.env.PORT || 8080
