@@ -51,7 +51,7 @@ const ProductDetails = () => {
     return (
         <Layouts>
             <div className="row container product-details">
-                <div className="col-md-6">
+                <div className="col-md-5">
                     <img
                         src={`${process.env.REACT_APP_API}/product/product-photo/${product._id}`}
                         className="card-img-top"
