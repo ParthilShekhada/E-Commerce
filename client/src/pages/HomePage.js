@@ -172,7 +172,7 @@ const HomePage = () => {
           <div className="d-flex flex-wrap">
             {products?.map((p) => (
               <div className="card m-2" key={p._id} style={{height:'510px'}}>
-                <img
+                <img onClick={() => navigate(`/product/${p.slug}`)}
                   src={`${process.env.REACT_APP_API}/product/product-photo/${p._id}`}
                   className="card-img-top"
                   alt={p.name}
