@@ -8,6 +8,8 @@ import '../styles/HomePage.css'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../context/cart'
 import { AiOutlineReload } from "react-icons/ai";
+import Loader from '../components/Layouts/Loader'
+
 
 
 
@@ -21,6 +23,9 @@ const HomePage = () => {
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [loadFilter, setLoadFilter] = useState(true)
+  const [spinner,setSpinner]=useState(false)
+
 
   const getTotal = async () => {
     try {
@@ -36,12 +41,16 @@ const HomePage = () => {
 
   const getAllProducts = async () => {
     try {
+      setSpinner(true)
+      setLoadFilter(true)
       setLoading(true)
       const { data } = await axios.get(`${process.env.REACT_APP_API}/product/product-list/${page}`);
       setLoading(false)
       setProducts(data.products);
+      setSpinner(false)
     } catch (error) {
       setLoading(false)
+      setSpinner(false)
       console.log(error);
     }
   };
@@ -77,10 +86,13 @@ const HomePage = () => {
 
   const filterProduct = async () => {
     try {
+      setSpinner(true)
       const { data } = await axios.post(`${process.env.REACT_APP_API}/product/products-filters`, { checked, radio })
       setProducts(data?.products)
-
+      setLoadFilter(false)
+      setSpinner(false)
     } catch (error) {
+      setSpinner(false)
       console.log(error)
     }
   }
@@ -169,6 +181,10 @@ const HomePage = () => {
         </div>
         <div className="col-md-9 ">
           <h1 className="text-center">All Products</h1>
+          {spinner &&
+        <Loader/>
+      }
+      {spinner==false && <>
           <div className="d-flex flex-wrap">
             {products?.map((p) => (
               <div className="card m-2" key={p._id} style={{height:'510px'}}>
@@ -224,6 +240,8 @@ const HomePage = () => {
                   setPage(page + 1);
                 }}
               >
+              {loadFilter &&
+                  <>
                 {loading ? (
                   "Loading ..."
                 ) : (
@@ -232,9 +250,12 @@ const HomePage = () => {
                     Loadmore <AiOutlineReload />
                   </>
                 )}
+                </>
+              }
               </button>
             )}
           </div>
+          </>}
         </div>
       </div>
     </Layouts >
