@@ -3,24 +3,29 @@ import { useParams, useNavigate } from "react-router-dom";
 import "../styles/CategoryProductStyles.css";
 import axios from "axios";
 import Layouts from "../components/Layouts/Layouts"
+import Loader from "../components/Layouts/Loader"
 
 const CategoryProduct = () => {
   const params = useParams();
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState([]);
+  const [spinner,setSpinner]=useState(false)
 
   useEffect(() => {
     if (params?.slug) getPrductsByCat();
   }, [params?.slug]);
   const getPrductsByCat = async () => {
     try {
+      setSpinner(true)
       const { data } = await axios.get(
         `${process.env.REACT_APP_API}/product/product-category/${params.slug}`
       );
       setProducts(data?.products);
       setCategory(data?.category);
+      setSpinner(false)
     } catch (error) {
+      setSpinner(false)
       console.log(error);
     }
   };
@@ -28,13 +33,18 @@ const CategoryProduct = () => {
   return (
     <Layouts>
       <div className="container mt-3 category">
+        {spinner &&
+        <Loader/>
+      }
+        {spinner==false && 
+        <>
         <h4 className="text-center">Category - {category?.name}</h4>
         <h6 className="text-center">{products?.length} result found </h6>
         <div className="row">
           <div className="col-md-9 offset-1">
             <div className="d-flex flex-wrap">
               {products?.map((p) => (
-                <div className="card m-2" style={{height:'510px'}}>
+                <div className="card m-2" key={p._id} style={{height:'510px'}}>
                   <img
                     src={`${process.env.REACT_APP_API}/product/product-photo/${p._id}`}
                     className="card-img-top"
@@ -71,7 +81,7 @@ const CategoryProduct = () => {
                       toast.success("Item Added to cart");
                     }}
                   >
-                    ADD TO CART
+                    ADD TO CART   
                   </button> */}
                     </div>
                   </div>
@@ -93,6 +103,7 @@ const CategoryProduct = () => {
           </div> */}
           </div>
         </div>
+        </> }
       </div>
     </Layouts>
   );
