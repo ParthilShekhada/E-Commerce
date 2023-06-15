@@ -6,6 +6,10 @@ import Layouts from "../components/Layouts/Layouts"
 import Loader from "../components/Layouts/Loader"
 import { useAuth } from "../context/auth";
 import { AiFillDelete } from "react-icons/ai";
+import { toast } from "react-hot-toast";
+import { useCart } from "../context/cart";
+
+
 
 
 const CategoryProduct = () => {
@@ -13,10 +17,12 @@ const CategoryProduct = () => {
     const [auth] = useAuth()
     const [products, setProducts] = useState([]);
     const [spinner, setSpinner] = useState(false)
+    const [cart, setCart] = useCart()
+
 
     useEffect(() => {
         getPrducts();
-    }, []);
+    }, [auth.user]);
     const getPrducts = async () => {
         try {
             const id = auth.user._id
@@ -32,30 +38,30 @@ const CategoryProduct = () => {
         }
     };
 
-    const removeProduct=async(pid)=>{
+    const removeProduct = async (pid) => {
         try {
             const userId = auth.user._id
             const { data } = await axios.put(
-                `${process.env.REACT_APP_API}/product/removewish-list`,{userId,pid}
+                `${process.env.REACT_APP_API}/product/removewish-list`, { userId, pid }
             );
             console.log(data)
             getPrducts()
-            
+
         } catch (error) {
             setSpinner(false)
 
         }
     }
 
-    const clearWishList=async()=>{
+    const clearWishList = async () => {
         try {
             const userId = auth.user._id
             const { data } = await axios.put(
-                `${process.env.REACT_APP_API}/product/clearwish-list`,{userId}
+                `${process.env.REACT_APP_API}/product/clearwish-list`, { userId }
             );
             console.log(data)
             getPrducts()
-            
+
         } catch (error) {
             setSpinner(false)
 
@@ -71,18 +77,20 @@ const CategoryProduct = () => {
                 {spinner == false &&
                     <>
                         <h4 className="text-center">WishList</h4>
-                        <AiFillDelete size={40} onClick={clearWishList} style={{position: 'absolute',top:'132px',right: '0',width: '200px'}}/>
+                        <AiFillDelete size={40} onClick={clearWishList} style={{ position: 'absolute', top: '132px', right: '0', width: '128px' }} />
                         <div className="row">
                             <div className="col-md-9 offset-1">
+                                <div className="container">
                                 <div className="d-flex flex-wrap">
                                     {products?.map((p) => (
-                                        <div className="card m-2" key={p._id} style={{ height: '510px' }}>
+                                        <div className="card m-2" key={p._id} style={{ height: '550px' }}>
                                             <img
+                                            style={{height:'229px'}}
                                                 src={`${process.env.REACT_APP_API}/product/product-photo/${p._id}`}
                                                 className="card-img-top"
                                                 alt={p.name}
                                             />
-                                            <div className="card-body">
+                                            <div className="card-body" >
                                                 <div className="card-name-price">
                                                     <h5 className="card-title">{p.name}</h5>
                                                     <h5 className="card-title card-price">
@@ -92,10 +100,10 @@ const CategoryProduct = () => {
                                                         })}
                                                     </h5>
                                                 </div>
-                                                <p className="card-text " >
+                                                <p className="card-text mb-3 " >
                                                     {p.description.substring(0, 50)}...
                                                 </p>
-                                                <div className="card-name-price" style={{ position: 'absolute', bottom: '9px', height: '35px', width: '250px' }}>
+                                                <div className="card-name-price" style={{ position: 'absolute', bottom: '55px', height: '35px', width: '250px' }}>
                                                     <button
                                                         className="btn btn-info ms-1"
                                                         onClick={() => navigate(`/product/${p.slug}`)}
@@ -104,16 +112,35 @@ const CategoryProduct = () => {
                                                     </button>
                                                     <button
                                                         className="btn btn-danger ms-1"
-                                                        onClick={()=>removeProduct(p._id)}
-                                                        
+                                                        onClick={() => removeProduct(p._id)}
+
                                                     >
-                                                        Remove
+                                                        Remove      
+                                                    </button>
+                                                    
+                                                </div>
+                                                <div style={{ position: 'absolute', bottom: '5px', height: '45px', width: '245px',marginLeft:'6px' }}>
+                                                <button
+                                                        className="btn btn-dark mt-1"
+                                                        onClick={() => {
+                                                            setCart([...cart, p]);
+                                                            localStorage.setItem(
+                                                                "cart",
+                                                                JSON.stringify([...cart, p])
+                                                            );
+                                                            toast.success("Item Added to cart");
+                                                        }}
+                                                    >
+                                                        ADD TO CART
                                                     </button>
                                                 </div>
                                             </div>
                                         </div>
+
                                     ))}
                                 </div>
+                                </div>
+
                                 {/* <div className="m-2 p-3">
             {products && products.length < total && (
               <button

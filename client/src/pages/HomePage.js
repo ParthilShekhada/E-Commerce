@@ -162,7 +162,7 @@ const HomePage = () => {
 
   useEffect(() => {
     makeLiked()
-  },[likedProduct.length])
+  },[auth.user,likedProduct.length])
 
 const makeLiked=async()=>{
   try {
