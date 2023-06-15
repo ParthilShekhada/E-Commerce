@@ -1,16 +1,35 @@
 const express=require('express')
 const { requireSignIn, isAdmin } = require('../middlewares/authMiddleware')
 const formidable=require('express-formidable')
-const { createProductController,updateProductController,braintreePaymentController,braintreeTokenController,productCategoryController,relatedProductController,searchProductController,productListController,productCountController,productFiltersController,ProductController,productPhotoController,singleProductController,deleteProductController } = require('../controllers/productController')
+const { createProductController,updateProductController,makeWishListController,clearWishListController,removeWishListController,getWishListController,likedController,braintreePaymentController,braintreeTokenController,productCategoryController,relatedProductController,searchProductController,productListController,productCountController,productFiltersController,ProductController,productPhotoController,singleProductController,deleteProductController } = require('../controllers/productController')
 
 
 const router=express.Router()
 
 
 //routes
+//All liked products
+router.post("/wish-list", requireSignIn, likedController)
+
+//get All wishlist products
+router.get("/getwish-list/:userId", requireSignIn, getWishListController)
+
+//remove product from wishlist
+router.put("/removewish-list", requireSignIn, removeWishListController)
+
+//clear wishlist
+router.put("/clearwish-list", requireSignIn, clearWishListController)
+
+//make liked product
+router.get("/makewish-list/:userId", requireSignIn, makeWishListController)
+
+
+
+
 //payement routes
 //token
 router.get('/braintree/token',requireSignIn,braintreeTokenController)
+
 
 //Create Product
 router.post('/create-product',requireSignIn,isAdmin,formidable(),createProductController)
@@ -53,6 +72,8 @@ router.get('/product-category/:slug',productCategoryController)
 
 //payment
 router.post("/braintree/payment", requireSignIn, braintreePaymentController);
+
+
 
 
 

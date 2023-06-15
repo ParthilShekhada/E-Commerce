@@ -65,6 +65,9 @@ const Header = () => {
                                     </li>
                                 ))}
                             </ul>
+                            <li className="nav-item">
+                                <NavLink className="nav-link" aria-current="page" to="/wishlist">Wishlist</NavLink>
+                            </li>
                             {
                                 !auth.user ? (<>
                                     <li className="nav-item">

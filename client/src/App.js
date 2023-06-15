@@ -24,6 +24,7 @@ import Categories from './pages/Categories';
 import CategoryProduct from './pages/CategoryProduct';
 import CartPage from './pages/user/CartPage';
 import AdminOrders from './pages/Admin/AdminOrders';
+import WishList from './pages/WishList'
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
         <Route path="/cart" element={<CartPage />} />
         <Route path="/product/:slug" element={<ProductDetails />} />
         <Route path="/categories" element={<Categories />} />
+        <Route path="/wishlist" element={<WishList />} />
         <Route path="/category/:slug" element={<CategoryProduct />} />
         <Route path="/dashboard" element={<Private />} >
           <Route path="user" element={<Dashboard />} />

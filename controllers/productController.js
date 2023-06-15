@@ -1,19 +1,22 @@
 const { default: slugify } = require("slugify")
 const ProductModel = require("../models/productModel")
-const categoryModel=require("../models/categoryModel")
+const categoryModel = require("../models/categoryModel")
 const fs = require('fs')
 const braintree = require("braintree");
 const orderModel = require("../models/orderModel");
+const wishList = require("../models/wishList");
+const productModel = require("../models/productModel");
+const { findById } = require("../models/userModel");
 
 
 //payement gateway
 var gateway = new braintree.BraintreeGateway({
-    environment:  braintree.Environment.Sandbox,
-    merchantId:   'vx82yrdw6rcyqznt',
-    publicKey:    '4rxrftsvyv2k45n8',
-    privateKey:   '6b662942f1834b22639432c85fb81360'
-  });
-  
+    environment: braintree.Environment.Sandbox,
+    merchantId: 'vx82yrdw6rcyqznt',
+    publicKey: '4rxrftsvyv2k45n8',
+    privateKey: '6b662942f1834b22639432c85fb81360'
+});
+
 
 
 const createProductController = async (req, res) => {
@@ -384,18 +387,18 @@ const productCategoryController = async (req, res) => {
 }
 
 
-const braintreeTokenController=async(req,res)=>{
+const braintreeTokenController = async (req, res) => {
     try {
-        gateway.clientToken.generate({},function(err,response){
-            if(err){
+        gateway.clientToken.generate({}, function (err, response) {
+            if (err) {
                 res.status(500).json({
-                    error:true,
-                    message:err.message
+                    error: true,
+                    message: err.message
                 })
             }
-            else{
+            else {
                 res.json({
-                    error:false,
+                    error: false,
                     response
                 })
             }
@@ -412,36 +415,36 @@ const braintreeTokenController=async(req,res)=>{
 }
 
 
-const braintreePaymentController=async(req,res)=>{
+const braintreePaymentController = async (req, res) => {
     try {
-        const {cart,nonce}=req.body
-        let total=0
+        const { cart, nonce } = req.body
+        let total = 0
 
-        cart.map(i=> total+=i.price)
+        cart.map(i => total += i.price)
 
-        let newTransaction=gateway.transaction.sale({
-            amount:total,
-            paymentMethodNonce:nonce,
-            options:{
-                submitForSettlement:true
+        let newTransaction = gateway.transaction.sale({
+            amount: total,
+            paymentMethodNonce: nonce,
+            options: {
+                submitForSettlement: true
             }
         },
-        function(error,result){
-            if(result){
-                console.log(result)
-                const order=new orderModel({
-                    products:cart,
-                    payement:result,
-                    buyer:req.user._id
-                }).save()
-                res.json({ok:true})
+            function (error, result) {
+                if (result) {
+                    console.log(result)
+                    const order = new orderModel({
+                        products: cart,
+                        payement: result,
+                        buyer: req.user._id
+                    }).save()
+                    res.json({ ok: true })
+                }
+                else {
+                    res.status(500).send(error)
+                }
             }
-            else{
-                res.status(500).send(error)
-            }
-        }
         )
-        
+
     } catch (error) {
         res.status(400).json({
             error: true,
@@ -452,9 +455,179 @@ const braintreePaymentController=async(req,res)=>{
 }
 
 
+const likedController = async (req, res) => {
+    try {
+      const { userId, productId } = req.body;
+  
+      if (!userId) {
+        return res.status(401).json({
+          error: true,
+          message: 'User login required',
+        });
+      }
+  
+      if (!productId) {
+        return res.status(401).json({
+          error: true,
+          message: 'Please provide a valid product ID',
+        });
+      }
+  
+      const userData = await wishList.findOne({ user: userId });
+  
+      if (userData) {
+        const isProductLiked = userData.product.some((p) => p._id == productId);
+        if (isProductLiked) {
+          return res.status(200).send({
+            error: false,
+            message: 'Product already liked',
+          });
+        }
+  
+        const addProduct = await wishList.findByIdAndUpdate(
+          { _id: userData._id },
+          { $push: { product: productId } },
+          { new: true }
+        );
+  
+        return res.status(201).send({
+          error: false,
+          message: 'Product liked successfully',
+        });
+      }
+  
+      await new wishList({ user: userId, product: productId }).save();
+  
+      return res.status(200).json({
+        error: false,
+        message: 'Product liked successfully',
+      });
+    } catch (error) {
+      res.status(400).json({
+        error: true,
+        errorMessage: error.message,
+        message: 'Error while liking post',
+      });
+    }
+  };
+  
+
+  const getWishListController=async(req,res)=>{
+    try {
+        
+        const {userId}=req.params
+
+
+        const [data] = await wishList.find(
+            { user: userId}
+          );
+
+
+
+        const products=await ProductModel.find({ "_id" : { "$in" : data.product } } ).select('-photo')
+
+         res.json({
+            error:false,
+            products
+        })
+
+
+
+    } catch (error) {
+        res.status(400).json({
+            error: true,
+            errorMessage: error.message,
+            message: 'Error while getting wishlist',
+          });
+    }
+  }
+
+  const makeWishListController=async(req,res)=>{
+    try {
+        
+        const {userId}=req.params
+
+
+        const [data] = await wishList.find(
+            { user: userId}
+          );
+
+         res.json({
+            error:false,
+            product:data.product
+        })
+
+    } catch (error) {
+        res.status(400).json({
+            error: true,
+            errorMessage: error.message,
+            message: 'Error while liked product',
+          });
+    }
+  }
+
+
+
+  const removeWishListController=async(req,res)=>{
+    try {
+
+        const {userId,pid}=req.body
+
+        const deleteData = await wishList.updateMany({ user: userId },{$pull : { product: {$in : [pid] }}}, {new: true})
+
+
+        res.json({
+            error:false,
+            message:'Item deleted successfully',
+            data:deleteData
+        })
+
+
+        
+
+    } catch (error) {
+        res.status(400).json({
+            error: true,
+            errorMessage: error.message,
+            message: 'Error while remove wishlist',
+          });
+    }
+  }
+
+
+  const clearWishListController=async(req,res)=>{
+    try {
+        const {userId}=req.body
+
+        // await wishList.deleteOne(
+        //     { user: userId}
+        //   );
+
+        await wishList.updateOne({ user: userId }, { $set: { product: [] } }, { new: true });
+
+
+
+          res.json({
+            error:false,
+            message:'Wishlist clear successfully',
+        })
+
+        
+
+        
+    } catch (error) {
+        res.status(400).json({
+            error: true,
+            errorMessage: error.message,
+            message: 'Error while clear wishlist',
+          });
+    }
+  }
+
+
 
 
 module.exports = {
-    createProductController, updateProductController, braintreeTokenController,ProductController,
-    singleProductController, productListController,braintreePaymentController, deleteProductController, productCountController, productPhotoController, productCategoryController, searchProductController, relatedProductController, productFiltersController
+    createProductController,makeWishListController,getWishListController,clearWishListController, likedController, updateProductController, braintreeTokenController, ProductController,
+    singleProductController,removeWishListController, productListController, braintreePaymentController, deleteProductController, productCountController, productPhotoController, productCategoryController, searchProductController, relatedProductController, productFiltersController
 }

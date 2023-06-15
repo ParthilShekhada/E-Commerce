@@ -7,8 +7,10 @@ import { Prices } from '../components/Layouts/Price'
 import '../styles/HomePage.css'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../context/cart'
-import { AiOutlineReload } from "react-icons/ai";
+import { AiFillHeart,AiOutlineHeart, AiOutlineReload } from "react-icons/ai";
 import Loader from '../components/Layouts/Loader'
+import { useAuth } from '../context/auth'
+
 
 
 
@@ -24,7 +26,11 @@ const HomePage = () => {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const [loadFilter, setLoadFilter] = useState(true)
-  const [spinner,setSpinner]=useState(false)
+  const [spinner, setSpinner] = useState(false)
+  const[likedProduct,setLikedProducts]=useState([])
+  const redHeartStyle={color:'red'}
+  const whiteHeartStyle={color:'white'}
+  const[auth]=useAuth()
 
 
   const getTotal = async () => {
@@ -136,9 +142,42 @@ const HomePage = () => {
   }, [checked, radio])
 
 
+  const addToWishList=async(pId,req,res)=>{
+    try {
+      // if(heartIcon.color=='white'){
+      //   setHeartIcon({color:'red'})
+      // }
+      // else{
+      //   setHeartIcon({color:'white'})
+      // }
+      const userId=auth.user._id
+
+      const { data } = await axios.post(`${process.env.REACT_APP_API}/product/wish-list`,{userId,productId:pId})
+    } catch (error) {
+
+    }
+  }
+
+  useEffect(() => {
+    makeLiked()
+  })
+
+const makeLiked=async()=>{
+  try {
+    const id = auth.user._id
+    const { data } = await axios.get(
+        `${process.env.REACT_APP_API}/product/makewish-list/${id}`
+    );
+    setLikedProducts(data?.product);
+
+} catch (error) {
+    setSpinner(false)
+    console.log(error);
+}
+}
   return (
     <Layouts title={'All Products-Best Offers'}>
-        <img
+      <img
         src="/images/khandani.png"
         className="banner-img"
         alt="bannerimage"
@@ -149,7 +188,7 @@ const HomePage = () => {
         <div className="col-md-3 filters">
           <h4 className="text-center">Filter By Category</h4>
           <div className="d-flex flex-column">
-            {categories?.map((c,index) => (
+            {categories?.map((c, index) => (
               <Checkbox
                 key={c._id}
                 style={{ marginLeft: index === 0 ? '-1px' : '0' }}
@@ -182,79 +221,84 @@ const HomePage = () => {
         <div className="col-md-9 ">
           <h1 className="text-center">All Products</h1>
           {spinner &&
-        <Loader/>
-      }
-      {spinner==false && <>
-          <div className="d-flex flex-wrap">
-            {products?.map((p) => (
-              <div className="card m-2" key={p._id} style={{height:'510px'}}>
-                <img
-                  src={`${process.env.REACT_APP_API}/product/product-photo/${p._id}`}
-                  className="card-img-top"
-                  alt={p.name}
-                />
-                <div className="card-body">
-                  <div className="card-name-price">
-                    <h5  className="card-title">{p.name}</h5>
-                    <h5 className="card-title card-price">
-                      {p.price.toLocaleString("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                      })}
-                    </h5>
+            <Loader />
+          }
+          {spinner == false && <>
+            <div className="d-flex flex-wrap">
+              {products?.map((p) => (
+                <div className="card m-2" key={p._id} style={{ height: '510px' }}>
+                  <img
+                    src={`${process.env.REACT_APP_API}/product/product-photo/${p._id}`}
+                    className="card-img-top"
+                    alt={p.name}
+                  />
+                  <div style={{position: 'absolute',top: '8px',right: '0px'}}>
+                    <div class="stage">
+                      <div class="heart"><AiFillHeart size={40} onClick={()=>addToWishList(p._id)} style={likedProduct?.includes(p._id)?redHeartStyle:whiteHeartStyle}/></div>
+                    </div>
                   </div>
-                  <p className="card-text ">
-                    {p.description.substring(0, 50)}...
-                  </p>
-                  <div className="card-name-price" style={{position:'absolute',bottom:'9px',height:'35px',width:'250px'}}>
-                    <button
-                      className="btn btn-info ms-1 "
-                      onClick={() => navigate(`/product/${p.slug}`)}
-                    >
-                      More Details
-                    </button>
-                    <button
-                      className="btn btn-dark ms-1"
-                      onClick={() => {
-                        setCart([...cart, p]);
-                        localStorage.setItem(
-                          "cart",
-                          JSON.stringify([...cart, p])
-                        );
-                        toast.success("Item Added to cart");
-                      }}
-                    >
-                      ADD TO CART
-                    </button>
+                  <div className="card-body">
+                    <div className="card-name-price">
+                      <h5 className="card-title">{p.name}</h5>
+                      <h5 className="card-title card-price">
+                        {p.price.toLocaleString("en-US", {
+                          style: "currency",
+                          currency: "USD",
+                        })}
+                      </h5>
+                    </div>
+                    <p className="card-text ">
+                      {p.description.substring(0, 50)}...
+                    </p>
+                    <div className="card-name-price" style={{ position: 'absolute', bottom: '9px', height: '35px', width: '250px' }}>
+                      <button
+                        className="btn btn-info ms-1 "
+                        onClick={() => navigate(`/product/${p.slug}`)}
+                      >
+                        More Details
+                      </button>
+                      <button
+                        className="btn btn-dark ms-1"
+                        onClick={() => {
+                          setCart([...cart, p]);
+                          localStorage.setItem(
+                            "cart",
+                            JSON.stringify([...cart, p])
+                          );
+                          toast.success("Item Added to cart");
+                        }}
+                      >
+                        ADD TO CART
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-          <div className="m-2 p-3">
-            {products && products.length < total && (
-              <button
-                className="btn loadmore"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setPage(page + 1);
-                }}
-              >
-              {loadFilter &&
-                  <>
-                {loading ? (
-                  "Loading ..."
-                ) : (
-                  <>
-                    {" "}
-                    Loadmore <AiOutlineReload />
-                  </>
-                )}
-                </>
-              }
-              </button>
-            )}
-          </div>
+              ))}
+            </div>
+            <div className="m-2 p-3">
+              {products && products.length < total && (
+                <button
+                  className="btn loadmore"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setPage(page + 1);
+                  }}
+                >
+                  {loadFilter &&
+                    <>
+                      {loading ? (
+                        "Loading ..."
+                      ) : (
+                        <>
+                          {" "}
+                          Loadmore <AiOutlineReload />
+                        </>
+                      )}
+                    </>
+                  }
+                </button>
+              )}
+            </div>
           </>}
         </div>
       </div>
