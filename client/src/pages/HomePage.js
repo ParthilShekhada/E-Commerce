@@ -29,8 +29,8 @@ const HomePage = () => {
   const [spinner, setSpinner] = useState(false)
   const[likedProduct,setLikedProducts]=useState([])
   const redHeartStyle={color:'red'}
-  const whiteHeartStyle={color:'white'}
-  const[auth]=useAuth()
+  const whiteHeartStyle={color:'#ffd0d0'}
+  const [auth]=useAuth()
 
 
   const getTotal = async () => {
@@ -126,7 +126,7 @@ const HomePage = () => {
 
 
   useEffect(() => {
-    if (!checked.length || !radio.length) getAllProducts()
+    if (!checked.length || !radio.length) getAllProducts() 
 
   }, [checked.length, radio.length])
 
@@ -144,15 +144,16 @@ const HomePage = () => {
 
   const addToWishList=async(pId,req,res)=>{
     try {
-      // if(heartIcon.color=='white'){
-      //   setHeartIcon({color:'red'})
-      // }
-      // else{
-      //   setHeartIcon({color:'white'})
-      // }
       const userId=auth.user._id
 
+      if(likedProduct?.includes(pId)){
+        const { data } = await axios.put(
+          `${process.env.REACT_APP_API}/product/removewish-list`,{userId,pid:pId}
+      );
+      }
+      else{
       const { data } = await axios.post(`${process.env.REACT_APP_API}/product/wish-list`,{userId,productId:pId})
+      }
       makeLiked()
     } catch (error) {
 
