@@ -153,6 +153,7 @@ const HomePage = () => {
       const userId=auth.user._id
 
       const { data } = await axios.post(`${process.env.REACT_APP_API}/product/wish-list`,{userId,productId:pId})
+      makeLiked()
     } catch (error) {
 
     }
@@ -160,7 +161,7 @@ const HomePage = () => {
 
   useEffect(() => {
     makeLiked()
-  })
+  },[likedProduct.length])
 
 const makeLiked=async()=>{
   try {
