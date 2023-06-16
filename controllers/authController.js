@@ -239,45 +239,46 @@ const getOrdersController = async (req, res) => {
   };
   
 
-  const getAllOrdersController = async (req, res) => {
-    try {
-      const orders = await orderModel
-        .find({})
-        .populate({
-          path: "products.product",
-          select: "-photo",
-        })
-        .populate("buyer", "name")
-        .sort({ createdAt: "-1" });
-  
-      const formattedOrders = orders.map((order) => {
-        const formattedProducts = order.products.map((product) => ({
-          _id: product.product._id,
-          name: product.product.name,
-          description: product.product.description.substring(0, 30),
-          price: product.product.price,
-          quantity: product.quantity,
-        }));
-  
-        return {
-          _id: order._id,
-          products: formattedProducts,
-          payment: order.payment,
-          buyer: order.buyer,
-        };
-      });
-  
-      res.json(formattedOrders);
-    } catch (error) {
-      console.log(error);
-      res.status(500).send({
-        success: false,
-        message: "Error while getting orders",
-        error,
-      });
-    }
-  };
-  
+const getAllOrdersController = async (req, res) => {
+  try {
+    const orders = await orderModel
+      .find({})
+      .populate({
+        path: "products.product",
+        select: "-photo",
+      })
+      .populate("buyer", "name")
+      .sort({ createdAt: "-1" });
+
+    const formattedOrders = orders.map((order) => {
+      const formattedProducts = order.products.map((product) => ({
+        _id: product.product._id,
+        name: product.product.name,
+        description: product.product.description.substring(0, 30),
+        price: product.product.price,
+        quantity: product.quantity,
+      }));
+
+      return {
+        _id: order._id,
+        products: formattedProducts,
+        payment: order.payment,
+        buyer: order.buyer,
+        status:order.status
+      };
+    });
+
+    res.json(formattedOrders);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error while getting orders",
+      error,
+    });
+  }
+};
+
 
   const orderStatusController = async (req, res) => {
     try {
