@@ -18,7 +18,7 @@ const CartPage = () => {
     const [instance, setInstance] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const [count, setCount] = useState(0);
+    const [count] = useState(0);
     const ButtonGroup = Button.Group;
 
     const increase = (productId) => {
@@ -38,7 +38,7 @@ const CartPage = () => {
     const decline = (productId) => {
         const updatedCart = cart.map((item) => {
             if (item._id === productId) {
-                if (item.itemCount == 0) {
+                if (item.itemCount === 0) {
                     return {
                         ...item,
                     };
@@ -105,7 +105,7 @@ const CartPage = () => {
         try {
             setLoading(true);
             const { nonce } = await instance.requestPaymentMethod();
-            const { data } = await axios.post(`${process.env.REACT_APP_API}/product/braintree/payment`, {
+             await axios.post(`${process.env.REACT_APP_API}/product/braintree/payment`, {
                 nonce,
                 cart,
             });

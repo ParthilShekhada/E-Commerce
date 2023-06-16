@@ -272,8 +272,8 @@ const addToCart=async(p)=>{
                     alt={p.name}
                   />
                   <div style={{position: 'absolute',top: '8px',right: '0px'}}>
-                    <div class="stage">
-                      <div class="heart"><AiFillHeart size={40} onClick={()=>addToWishList(p._id)} style={likedProduct?.includes(p._id)?redHeartStyle:whiteHeartStyle}/></div>
+                    <div className="stage">
+                      <div className="heart"><AiFillHeart size={40} onClick={()=>addToWishList(p._id)} style={likedProduct?.includes(p._id)?redHeartStyle:whiteHeartStyle}/></div>
                     </div>
                   </div>
                   <div className="card-body">

@@ -73,7 +73,7 @@ const ProductDetails = () => {
                         })}
                     </h6>
                     <h6>Category : {category}</h6>
-                    <button class="btn btn-secondary ms-1"  onClick={()=>{
+                    <button className="btn btn-secondary ms-1"  onClick={()=>{
                     setCart([...cart,product])
                     toast.success('Item Added to Cart')
                   }}>ADD TO CART</button>

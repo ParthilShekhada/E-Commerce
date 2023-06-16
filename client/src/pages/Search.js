@@ -82,7 +82,7 @@ const Search = () => {
                     >
                       More Details
                     </button>
-                    <button class="btn btn-secondary"
+                    <button className="btn btn-secondary"
                       onClick={() => addToCart(p)}>ADD TO CART</button>
                   </div>
                 </div>
