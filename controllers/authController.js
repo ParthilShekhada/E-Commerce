@@ -224,6 +224,7 @@ const getOrdersController = async (req, res) => {
           _id: order._id,
           products: formattedProducts,
           payment: order.payment,
+          status:order.status,
           buyer: order.buyer,
         };
       });

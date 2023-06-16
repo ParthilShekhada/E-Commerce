@@ -55,6 +55,7 @@ const Orders = () => {
                     <tbody>
                       <tr>
                         <td>{i + 1}</td>
+                        {console.log(o)}
                         <td>{o?.status}</td>
                         <td>{o?.buyer?.name}</td>
                         <td>{moment(o?.createAt).fromNow()}</td>
