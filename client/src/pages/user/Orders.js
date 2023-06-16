@@ -83,7 +83,7 @@ const Orders = () => {
                           <p>{p.name}</p>
                           <p>{p.description.substring(0, 30)}</p>
                           <p>Price : {p.price}</p>
-                          <p>Quntity : {p.quantity}</p>
+                          <p>Quantity : {p.quantity}</p>
                         </div>
                       </div>
                     ))}
