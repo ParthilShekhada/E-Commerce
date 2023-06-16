@@ -201,24 +201,42 @@ const updateProfileController=async(req,res)=>{
     }
 }
 
-const getOrdersController=async(req,res)=>{
+const getOrdersController = async (req, res) => {
     try {
-        const orders = await orderModel
-      .find({ buyer: req.user._id })
-      .populate("products", "-photo")
-      .populate("buyer", "name");
-    res.json(orders);
-
-        
-
+      const orders = await orderModel
+        .find({ buyer: req.user._id })
+        .populate({
+          path: "products.product",
+          select: "-photo",
+        })
+        .populate("buyer", "name");
+  
+      const formattedOrders = orders.map((order) => {
+        const formattedProducts = order.products.map((product) => ({
+          _id: product.product._id,
+          name: product.product.name,
+          description: product.product.description.substring(0, 30),
+          price: product.product.price,
+          quantity: product.quantity,
+        }));
+  
+        return {
+          _id: order._id,
+          products: formattedProducts,
+          payment: order.payment,
+          buyer: order.buyer,
+        };
+      });
+  
+      res.json(formattedOrders);
     } catch (error) {
-        res.status(500).json({
-            error:true,
-            message:error.message
-        }) 
+      res.status(500).json({
+        error: true,
+        message: error.message,
+      });
     }
-}
-
+  };
+  
 
 const getAllOrdersController = async (req, res) => {
     try {

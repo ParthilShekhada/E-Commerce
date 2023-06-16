@@ -7,7 +7,8 @@ import "../../styles/CartStyles.css";
 import Layouts from "../../components/Layouts/Layouts";
 import { useCart } from "../../context/cart";
 import { useAuth } from "../../context/auth";
-
+import { Button, Space } from 'antd';
+import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
 
 
 const CartPage = () => {
@@ -17,13 +18,52 @@ const CartPage = () => {
     const [instance, setInstance] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const [count, setCount] = useState(0);
+    const ButtonGroup = Button.Group;
 
-    //total price
+    const increase = (productId) => {
+        const updatedCart = cart.map((item) => {
+            if (item._id === productId) {
+                return {
+                    ...item,
+                    itemCount: item.itemCount + 1
+                };
+            }
+            return item;
+        });
+        setCart(updatedCart);
+        localStorage.setItem("cart", JSON.stringify(updatedCart));
+    };
+
+    const decline = (productId) => {
+        const updatedCart = cart.map((item) => {
+            if (item._id === productId) {
+                if (item.itemCount == 0) {
+                    return {
+                        ...item,
+                    };
+                }
+                else {
+                    return {
+                        ...item,
+                        itemCount: item.itemCount - 1
+                    };
+                }
+
+            }
+            return item;
+        });
+        setCart(updatedCart);
+        localStorage.setItem("cart", JSON.stringify(updatedCart));
+    };
+
+
+
     const totalPrice = () => {
         try {
             let total = 0;
             cart?.map((item) => {
-                total = total + item.price;
+                total += item.price * item.itemCount;
             });
             return total.toLocaleString("en-US", {
                 style: "currency",
@@ -33,6 +73,7 @@ const CartPage = () => {
             console.log(error);
         }
     };
+
     //detele item
     const removeCartItem = (pid) => {
         try {
@@ -50,7 +91,7 @@ const CartPage = () => {
     const getToken = async () => {
         try {
             const { data } = await axios.get(`${process.env.REACT_APP_API}/product/braintree/token`);
-            
+
             setClientToken(data?.response.clientToken);
         } catch (error) {
         }
@@ -114,6 +155,13 @@ const CartPage = () => {
                                         <p>{p.name}</p>
                                         <p>{p.description.substring(0, 30)}</p>
                                         <p>Price : {p.price}</p>
+                                        <Space size="large">
+                                            <ButtonGroup>
+                                                <Button onClick={() => decline(p._id)} icon={<MinusOutlined />} />
+                                                <Button onClick={() => increase(p._id)} icon={<PlusOutlined />} />
+                                                <Button >{p.itemCount + count}</Button>
+                                            </ButtonGroup>
+                                        </Space>
                                     </div>
                                     <div className="col-md-4 cart-remove-btn">
                                         <button
@@ -122,6 +170,7 @@ const CartPage = () => {
                                         >
                                             Remove
                                         </button>
+
                                     </div>
                                 </div>
                             ))}
@@ -182,7 +231,7 @@ const CartPage = () => {
                                             onInstance={(instance) => setInstance(instance)}
                                         />
 
-                                        <button style={{marginBottom:'30px'}}
+                                        <button style={{ marginBottom: '30px' }}
                                             className="btn btn-primary"
                                             onClick={handlePayment}
                                             disabled={loading || !instance || !auth?.user?.address}

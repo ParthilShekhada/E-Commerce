@@ -417,42 +417,49 @@ const braintreeTokenController = async (req, res) => {
 
 const braintreePaymentController = async (req, res) => {
     try {
-        const { cart, nonce } = req.body
-        let total = 0
-
-        cart.map(i => total += i.price)
-
-        let newTransaction = gateway.transaction.sale({
-            amount: total,
-            paymentMethodNonce: nonce,
-            options: {
-                submitForSettlement: true
-            }
+      const { cart, nonce } = req.body;
+      let total = 0;
+  
+      cart.forEach((item) => {
+        total += item.price * item.quantity;
+      });
+  
+      let newTransaction = gateway.transaction.sale(
+        {
+          amount: total,
+          paymentMethodNonce: nonce,
+          options: {
+            submitForSettlement: true,
+          },
         },
-            function (error, result) {
-                if (result) {
-                    console.log(result)
-                    const order = new orderModel({
-                        products: cart,
-                        payement: result,
-                        buyer: req.user._id
-                    }).save()
-                    res.json({ ok: true })
-                }
-                else {
-                    res.status(500).send(error)
-                }
-            }
-        )
-
+        function (error, result) {
+          if (result) {
+            console.log(result);
+            const products = cart.map((item) => ({
+              product: item._id,
+              quantity: item.itemCount,
+            }));
+            const order = new orderModel({
+              products: products,
+              payment: result,
+              buyer: req.user._id,
+            });
+            order.save();
+            res.json({ ok: true });
+          } else {
+            res.status(500).send(error);
+          }
+        }
+      );
     } catch (error) {
-        res.status(400).json({
-            error: true,
-            errorMessage: error.message,
-            message: 'Error in payement gateway'
-        })
+      res.status(400).json({
+        error: true,
+        errorMessage: error.message,
+        message: 'Error in payment gateway',
+      });
     }
-}
+  };
+  
 
 
 const likedController = async (req, res) => {
