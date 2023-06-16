@@ -421,7 +421,7 @@ const braintreePaymentController = async (req, res) => {
       let total = 0;
   
       cart.forEach((item) => {
-        total += item.price * item.quantity;
+        total += item.price * item.itemCount;
       });
   
       let newTransaction = gateway.transaction.sale(

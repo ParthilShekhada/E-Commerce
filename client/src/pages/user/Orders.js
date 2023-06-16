@@ -50,6 +50,7 @@ const Orders = () => {
                         <th scope="col"> date</th>
                         <th scope="col">Payment</th>
                         <th scope="col">Quantity</th>
+                        <th scope="col">Total</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -61,6 +62,7 @@ const Orders = () => {
                         <td>{moment(o?.createAt).fromNow()}</td>
                         <td>{o?.payment.success ? "Success" : "Failed"}</td>
                         <td>{o?.products?.length}</td>
+                        <td>{o?.payment.transaction.amount}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -80,7 +82,7 @@ const Orders = () => {
                         <div className="col-md-8">
                           <p>{p.name}</p>
                           <p>{p.description.substring(0, 30)}</p>
-                          <p>Price : {p.price*p.quantity}</p>
+                          <p>Price : {p.price}</p>
                           <p>Quntity : {p.quantity}</p>
                         </div>
                       </div>
