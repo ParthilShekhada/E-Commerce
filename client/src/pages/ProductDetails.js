@@ -48,6 +48,43 @@ const ProductDetails = () => {
             console.log(error);
         }
     };
+
+
+    const addToCart=async(p)=>{
+        try {
+          const existingProduct = cart.find((item) => item._id === p._id);
+      
+          if (existingProduct) {
+            const updatedCart = cart.map((item) => {
+                if (item._id === p._id) {
+                    return {
+                        ...item,
+                        itemCount: item.itemCount + 1
+                    };
+                }
+                return item;
+            });
+      
+            setCart(updatedCart);
+            localStorage.setItem("cart", JSON.stringify(updatedCart));
+            toast.success("Quantity updated in cart");
+      
+        } else {
+            setCart([...cart, {...p,itemCount:1}]);
+            localStorage.setItem(
+              "cart",
+              JSON.stringify([...cart, p])
+            );
+            toast.success("Item Added to cart");
+        }
+          
+         
+           
+          
+        } catch (error) {
+          
+        }
+      }
     return (
         <Layouts>
             <div className="row container product-details">
@@ -72,10 +109,7 @@ const ProductDetails = () => {
                         })}
                     </h6>
                     <h6>Category : {category}</h6>
-                    <button className="btn btn-secondary ms-1"  onClick={()=>{
-                    setCart([...cart,product])
-                    toast.success('Item Added to Cart')
-                  }}>ADD TO CART</button>
+                    <button className="btn btn-secondary ms-1"  onClick={()=>addToCart(product)}>ADD TO CART</button>
                 </div>
             </div>
             <hr />
