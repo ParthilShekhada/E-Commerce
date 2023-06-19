@@ -76,7 +76,8 @@ const CategoryProduct = () => {
                 }
                 {spinner == false &&
                     <>
-                        <h4 className="text-center">WishList</h4>
+                        <h3 className="text-center">WishList</h3>
+                        {products.length>0?(<>
                         <AiFillDelete size={40} onClick={clearWishList} style={{ position: 'absolute', top: '132px', right: '0', width: '128px' }} />
                         <div className="row">
                             <div className="col-md-9 offset-1">
@@ -155,7 +156,7 @@ const CategoryProduct = () => {
             )}
           </div> */}
                             </div>
-                        </div>
+                        </div></>):(<h6 className="text-center">Empty WishList</h6>)}
                     </>}
             </div>
         </Layouts>
