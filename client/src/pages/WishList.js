@@ -68,6 +68,42 @@ const CategoryProduct = () => {
         }
     }
 
+    const addToCart=async(p)=>{
+        try {
+          const existingProduct = cart.find((item) => item._id === p._id);
+      
+          if (existingProduct) {
+            const updatedCart = cart.map((item) => {
+                if (item._id === p._id) {
+                    return {
+                        ...item,
+                        itemCount: item.itemCount + 1
+                    };
+                }
+                return item;
+            });
+      
+            setCart(updatedCart);
+            localStorage.setItem("cart", JSON.stringify(updatedCart));
+            toast.success("Quantity updated in cart");
+      
+        } else {
+            setCart([...cart, {...p,itemCount:1}]);
+            localStorage.setItem(
+              "cart",
+              JSON.stringify([...cart, p])
+            );
+            toast.success("Item Added to cart");
+        }
+          
+         
+           
+          
+        } catch (error) {
+          
+        }
+      }
+
     return (
         <Layouts>
             <div className="container mt-3 category">
@@ -123,14 +159,7 @@ const CategoryProduct = () => {
                                                 <div style={{ position: 'absolute', bottom: '5px', height: '45px', width: '245px',marginLeft:'6px' }}>
                                                 <button
                                                         className="btn btn-dark mt-1"
-                                                        onClick={() => {
-                                                            setCart([...cart, p]);
-                                                            localStorage.setItem(
-                                                                "cart",
-                                                                JSON.stringify([...cart, p])
-                                                            );
-                                                            toast.success("Item Added to cart");
-                                                        }}
+                                                        onClick={() => addToCart(p)}
                                                     >
                                                         ADD TO CART
                                                     </button>
