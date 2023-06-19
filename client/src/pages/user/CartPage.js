@@ -9,6 +9,8 @@ import { useCart } from "../../context/cart";
 import { useAuth } from "../../context/auth";
 import { Button, Space } from 'antd';
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
+import { AiFillDelete } from "react-icons/ai";
+
 
 
 const CartPage = () => {
@@ -96,6 +98,15 @@ const CartPage = () => {
         } catch (error) {
         }
     };
+
+    const clearCart=()=>{
+        try {
+            localStorage.removeItem("cart");
+            setCart([])
+        } catch (error) {
+
+        }
+    }
     useEffect(() => {
         getToken();
     }, [auth?.token]);
@@ -128,6 +139,7 @@ const CartPage = () => {
                             {!auth?.user
                                 ? "Hello Guest"
                                 : `Hello  ${auth?.token && auth?.user?.name}`}
+                                 <AiFillDelete size={40} onClick={clearCart}  style={{ position: 'absolute', top: '162px', right: '0', width: '128px' }} />
                             <p className="text-center">
                                 {cart?.length
                                     ? `You Have ${cart.length} items in your cart ${auth?.token ? "" : "please login to checkout !"
