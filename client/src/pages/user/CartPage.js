@@ -9,7 +9,6 @@ import { useCart } from "../../context/cart";
 import { useAuth } from "../../context/auth";
 import { Button, Space } from 'antd';
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
-import { AiFillDelete } from "react-icons/ai";
 
 
 const CartPage = () => {
@@ -19,7 +18,7 @@ const CartPage = () => {
     const [instance, setInstance] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const [count] = useState(0);
+    const [count, setCount] = useState(0);
     const ButtonGroup = Button.Group;
 
     const increase = (productId) => {
@@ -39,7 +38,7 @@ const CartPage = () => {
     const decline = (productId) => {
         const updatedCart = cart.map((item) => {
             if (item._id === productId) {
-                if (item.itemCount === 0) {
+                if (item.itemCount == 0) {
                     return {
                         ...item,
                     };
@@ -106,7 +105,7 @@ const CartPage = () => {
         try {
             setLoading(true);
             const { nonce } = await instance.requestPaymentMethod();
-            await axios.post(`${process.env.REACT_APP_API}/product/braintree/payment`, {
+            const { data } = await axios.post(`${process.env.REACT_APP_API}/product/braintree/payment`, {
                 nonce,
                 cart,
             });
@@ -120,15 +119,6 @@ const CartPage = () => {
             setLoading(false);
         }
     };
-
-    const clearCart=()=>{
-        try {
-            localStorage.removeItem("cart");
-            setCart([])
-        } catch (error) {
-            
-        }
-    }
     return (
         <Layouts>
             <div className=" cart-page">
@@ -138,8 +128,6 @@ const CartPage = () => {
                             {!auth?.user
                                 ? "Hello Guest"
                                 : `Hello  ${auth?.token && auth?.user?.name}`}
-                            <AiFillDelete size={40} onClick={clearCart}  style={{ position: 'absolute', top: '162px', right: '0', width: '128px' }} />
-
                             <p className="text-center">
                                 {cart?.length
                                     ? `You Have ${cart.length} items in your cart ${auth?.token ? "" : "please login to checkout !"
@@ -163,9 +151,9 @@ const CartPage = () => {
                                             height={"130px"}
                                         />
                                     </div>
-                                    <div className="col-md-5">
+                                    <div className="col-md-4">
                                         <p>{p.name}</p>
-                                        <p>{p.description.substring(0, 28)}...</p>
+                                        <p>{p.description.substring(0, 30)}</p>
                                         <p>Price : {p.price}</p>
                                         <Space size="large">
                                             <ButtonGroup>
@@ -175,7 +163,7 @@ const CartPage = () => {
                                             </ButtonGroup>
                                         </Space>
                                     </div>
-                                    <div className="col-md-3 cart-remove-btn">
+                                    <div className="col-md-4 cart-remove-btn">
                                         <button
                                             className="btn btn-danger"
                                             onClick={() => removeCartItem(p._id)}

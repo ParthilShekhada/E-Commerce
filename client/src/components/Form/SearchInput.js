@@ -20,7 +20,7 @@ const SearchInput = () => {
     }
   };
   return (
-    <div style={{marginRight:'200px'}}>
+    <div style={{marginRight:'115px'}}>
       <form
         className="d-flex search-form"
         role="search"
